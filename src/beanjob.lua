@@ -10,20 +10,14 @@ function beanjob:new(id, data)
 	return object
 end
 
+--Get the data field from the job
 function beanjob:getdata()
 	return self.data
 end
 
+--Get the id of the job
 function beanjob:getid()
 	return self.id
-end
-
-function beanjob:setdata(entry)
-	self.data = entry
-end
-
-function beanjob:setid(jobid)
-	self.id = jobid
 end
 
 return beanjob

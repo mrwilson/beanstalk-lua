@@ -8,8 +8,9 @@ local error = error
 module("beanstalk")
 
 beanstalk = {}
-local crlf = "\r\n"
 
+--Carriage-return + linefeed for writing to the socket.
+local crlf = "\r\n"
 
 --Create a new beanstalk object
 function beanstalk:new() 
@@ -24,8 +25,9 @@ function beanstalk:connect(server, port)
 	local result, err = self.connection:connect(server,port)
 	if result ~= nil then
 		print("Successful connection to "..server..":"..port)
+		return nil
 	else
-		print("Bad connection: "..err)
+		error(err)
 	end
 end
 
@@ -44,6 +46,7 @@ function beanstalk:put(data, priority)
 	end
 end
 
+--Watch a tube, for reserving jobs
 function beanstalk:watch(tube)
 	if self.connection ~= nil then
 		self.connection:send("watch "..tube..crlf)
@@ -57,6 +60,7 @@ function beanstalk:watch(tube)
 	end
 end
 
+--Reserve a job from the queue, return a beanjob
 function beanstalk:reserve()
 	if self.connection ~= nil then
 		self.connection:send("reserve"..crlf)
@@ -64,8 +68,7 @@ function beanstalk:reserve()
 		print(line)
 		if starts(line,"RESERVED") then
 			id, data = string.match( line, "%S+ (%S+) (%S+)" )
-			line = self.connection:receive( "*l")
-			
+			line = self.connection:receive("*l")
 			job = beanjob:new(line, id)
 			return job
 		else
@@ -76,7 +79,8 @@ function beanstalk:reserve()
 	end
 end
 
-function beanstalk:use(tube) 
+--Use a tube, for writing jobs
+function beanstalk:use(tube)
 	if self.connection ~= nil then
 		self.connection:send("use "..tube..crlf)
 		line = self.connection:receive( "*l")
@@ -91,6 +95,7 @@ function beanstalk:use(tube)
 	end
 end
 
+--Utility function for checking whether one string starts with another
 function starts(String,Start)
    return string.sub(String,1,string.len(Start))==Start
 end
