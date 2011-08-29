@@ -54,7 +54,7 @@ function beanstalk:use(tube)
 				print("use - Successfully using "..tube)
 				return nil
 			else 
-				return line
+				error()
 			end
 		until line == ""
 	else 
