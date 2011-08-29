@@ -20,7 +20,13 @@ function beanstalk:connect(server, port)
 	else
 		print("Bad connection: "..err)
 	end
-	
+	repeat
+		line = conn:receive( "*l")
+		print( line )
+		parseLine( line )
+	until line == ""
 end
+
+function beanstalk:listen(tube)
 
 return beanstalk 
